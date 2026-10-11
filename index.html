@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TastyTrail — Online Food Ordering</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & VARS ── */
+:root{
+  --or:#0F766E;--ord:#115E59;--orl:#F0FDFA;
+  --g9:#1A120B;--g7:#4A3F35;--g5:#8C7B6E;--g3:#C4B9AE;--g1:#EDE8E3;--g0:#F9F5F2;
+  --green:#16A34A;--red:#DC2626;
+  --fd:'Playfair Display',serif;--fb:'DM Sans',sans-serif;
+  --sh:0 4px 20px rgba(15,118,110,.14);--sh2:0 10px 40px rgba(0,0,0,.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--g0);color:var(--g9)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--or);border-radius:10px}
+
+/* ── UTILS ── */
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.section-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--or);margin-bottom:8px}
+.section-title{font-family:var(--fd);font-size:clamp(26px,3.5vw,42px);font-weight:900;margin-bottom:14px;line-height:1.15}
+.veg-dot{display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px solid;margin-right:6px;vertical-align:middle}
+.veg{border-color:var(--green);background:var(--green)}
+.nonveg{border-color:var(--red);background:var(--red)}
+
+/* ── REQUIREMENT 7: HOVER EFFECTS ── */
+/* Button hover */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 24px;border-radius:999px;font-family:var(--fb);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .25s cubic-bezier(.34,1.2,.64,1);text-decoration:none}
+.btn-or{background:var(--or);color:#fff}
+.btn-or:hover{background:var(--ord);transform:translateY(-2px);box-shadow:var(--sh)}
+.btn-out{background:transparent;color:var(--or);border:2px solid var(--or)}
+.btn-out:hover{background:var(--orl);transform:translateY(-2px)}
+.btn-ghost{background:var(--g0);color:var(--g7);border:1px solid var(--g1)}
+.btn-ghost:hover{border-color:var(--or);color:var(--or);background:var(--orl)}
+.btn-sm{padding:7px 16px;font-size:12px}
+.btn-xs{padding:5px 12px;font-size:11px}
+
+/* ── REQUIREMENT 1: NAVIGATION ── */
+nav{position:sticky;top:0;z-index:500;background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--g1);transition:box-shadow .3s}
+nav.scrolled{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-logo{font-family:var(--fd);font-size:22px;font-weight:900;text-decoration:none;color:var(--g9)}
+.nav-logo span{color:var(--or)}
+/* Navigation links using <a> hyperlinks */
+.nav-links{display:flex;align-items:center;gap:6px;list-style:none}
+.nav-links li a{
+  display:inline-block;padding:8px 16px;border-radius:999px;
+  font-size:13px;font-weight:600;color:var(--g5);text-decoration:none;
+  transition:all .2s;border:1.5px solid transparent;
+}
+/* HOVER EFFECT on nav links */
+.nav-links li a:hover{color:var(--or);background:var(--orl);border-color:var(--or)}
+.nav-links li a.active{color:var(--or);background:var(--orl);border-color:var(--or)}
+/* Navigation buttons */
+.nav-actions{display:flex;align-items:center;gap:10px}
+.cart-btn{display:flex;align-items:center;gap:7px;background:var(--orl);color:var(--or);padding:9px 18px;border-radius:999px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all .22s}
+.cart-btn:hover{background:var(--or);color:#fff;transform:scale(1.05)}
+.cart-count{background:var(--or);color:#fff;width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.cart-btn:hover .cart-count{background:#fff;color:var(--or)}
+
+/* ── HERO ── */
+#home{position:relative;min-height:88vh;display:flex;align-items:center;background:#fff;overflow:hidden;padding-top:0}
+.hero-bg{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1400&auto=format&fit=crop&q=80') center/cover;opacity:.13}
+.hero-orb{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(15,118,110,.15) 0%,transparent 70%);width:600px;height:600px;top:-150px;right:-150px;animation:orb 8s ease-in-out infinite}
+@keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-30px)}}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;padding:90px 0 70px}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--orl);color:var(--or);padding:6px 16px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:22px}
+.pulse{width:8px;height:8px;background:var(--or);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+.hero-h1{font-family:var(--fd);font-size:clamp(38px,5vw,66px);font-weight:900;line-height:1.08;margin-bottom:20px}
+.hero-h1 .accent{color:var(--or);position:relative}
+.hero-h1 .accent::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:4px;background:var(--or);border-radius:2px;transform:scaleX(0);transform-origin:left;animation:underline .8s .7s ease forwards}
+@keyframes underline{to{transform:scaleX(1)}}
+.hero-sub{font-size:16px;color:var(--g5);line-height:1.75;margin-bottom:32px}
+.hero-ctas{display:flex;gap:13px;flex-wrap:wrap}
+.hero-stats{display:flex;gap:30px;margin-top:42px;padding-top:32px;border-top:1px solid var(--g1)}
+.stat-val{font-family:var(--fd);font-size:24px;font-weight:900}
+.stat-lbl{font-size:11px;color:var(--g5)}
+.hero-img-wrap{position:relative}
+.hero-img{width:100%;max-width:480px;aspect-ratio:1;border-radius:50% 35% 50% 35%;object-fit:cover;box-shadow:0 24px 80px rgba(15,118,110,.2);animation:morph 9s ease-in-out infinite;margin:0 auto;display:block}
+@keyframes morph{0%,100%{border-radius:50% 35% 50% 35%}50%{border-radius:35% 55% 35% 55%}}
+/* Floating cards — hover effect */
+.float-card{position:absolute;background:#fff;border-radius:16px;padding:11px 15px;box-shadow:0 6px 24px rgba(0,0,0,.10);display:flex;align-items:center;gap:10px;animation:float 4s ease-in-out infinite;transition:transform .2s,box-shadow .2s}
+.float-card:hover{transform:translateY(-4px)!important;box-shadow:0 12px 32px rgba(0,0,0,.15)}
+.fc1{top:14%;left:-10%}.fc2{bottom:20%;right:-8%;animation-delay:-2.2s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* ── OFFERS SECTION ── */
+#offers{padding:70px 0;background:var(--g0)}
+.offers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:32px}
+/* HOVER EFFECT on offer cards */
+.offer-card{border-radius:20px;padding:28px;display:flex;align-items:center;gap:18px;border:1px solid transparent;cursor:pointer;transition:all .28s cubic-bezier(.34,1.2,.64,1);position:relative;overflow:hidden}
+.offer-card:hover{transform:translateY(-6px);box-shadow:var(--sh2);border-color:transparent}
+.offer-card.o1{background:linear-gradient(135deg,var(--or),var(--ord))}
+.offer-card.o2{background:linear-gradient(135deg,#1A6B3C,#0D4225)}
+.offer-card.o3{background:linear-gradient(135deg,#1D3A8A,#0F2260)}
+.offer-card::before{content:'';position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.09)}
+.offer-emoji{font-size:42px;flex-shrink:0}
+.offer-title{font-family:var(--fd);font-size:19px;font-weight:900;color:#fff;margin-bottom:4px}
+.offer-sub{font-size:13px;color:rgba(255,255,255,.8)}
+.offer-code{display:inline-block;background:rgba(255,255,255,.18);color:#fff;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-top:7px;letter-spacing:.05em}
+
+/* ── REQUIREMENT 2: FOOD CATEGORIES — TABS + DROPDOWN ── */
+#menu{padding:70px 0;background:#fff}
+.menu-controls{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:30px}
+/* TAB buttons for categories */
+.tab-bar{display:flex;gap:8px;flex-wrap:wrap}
+.tab-btn{padding:9px 20px;border-radius:999px;border:2px solid var(--g1);background:#fff;color:var(--g5);font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer;transition:all .22s}
+/* HOVER EFFECT on tabs */
+.tab-btn:hover{border-color:var(--or);color:var(--or);background:var(--orl)}
+.tab-btn.active{background:var(--or);color:#fff;border-color:var(--or)}
+/* DROPDOWN for veg/nonveg filter — Requirement 2 */
+.filter-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.menu-search{padding:9px 15px;border:1.5px solid var(--g1);border-radius:999px;font-family:var(--fb);font-size:13px;min-width:180px;outline:none}
+.menu-search:focus{border-color:var(--or);box-shadow:0 0 0 3px rgba(15,118,110,.08)}
+.filter-label{font-size:13px;font-weight:600;color:var(--g5)}
+.filter-select{padding:9px 16px;border:1.5px solid var(--g1);border-radius:999px;font-family:var(--fb);font-size:13px;color:var(--g7);background:#fff;outline:none;cursor:pointer;transition:border-color .2s}
+.filter-select:hover{border-color:var(--or)}
+.filter-select:focus{border-color:var(--or);box-shadow:0 0 0 3px rgba(15,118,110,.08)}
+/* Tab content panels */
+.tab-panel{display:none}.tab-panel.active{display:block}
+.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:22px}
+
+/* ── FOOD CARDS — with checkbox, radio, accordion ── */
+.food-card{background:#fff;border-radius:18px;border:1px solid var(--g1);overflow:hidden;transition:all .28s cubic-bezier(.34,1.2,.64,1)}
+/* HOVER EFFECT on food cards */
+.food-card:hover{transform:translateY(-5px);box-shadow:var(--sh2);border-color:transparent}
+.food-card.selected{border-color:var(--or);box-shadow:0 0 0 2px var(--orl),var(--sh)}
+.food-card-img{width:100%;height:180px;object-fit:cover;display:block;transition:transform .4s}
+.food-card:hover .food-card-img{transform:scale(1.05)}
+.food-card-body{padding:16px}
+.food-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.food-name{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--g9)}
+.food-price{font-size:16px;font-weight:700;color:var(--or);white-space:nowrap}
+.food-desc{font-size:12px;color:var(--g5);line-height:1.6;margin-bottom:12px}
+.food-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.food-tag{font-size:10px;background:var(--g0);color:var(--g5);padding:2px 8px;border-radius:999px;font-weight:600}
+.food-tag.hot{background:#FEF3C7;color:#92400E}
+.food-tag.new{background:#DBEAFE;color:#1E40AF}
+/* REQUIREMENT 3: CHECKBOXES ── */
+.food-check-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.food-check-row input[type="checkbox"]{width:18px;height:18px;accent-color:var(--or);cursor:pointer}
+.food-check-label{font-size:13px;font-weight:600;color:var(--g7);cursor:pointer}
+/* REQUIREMENT 3: RADIO BUTTONS (size/variant) ── */
+.size-row{display:flex;gap:8px;margin-bottom:14px}
+.size-opt{display:flex;align-items:center;gap:5px}
+.size-opt input[type="radio"]{accent-color:var(--or);width:15px;height:15px;cursor:pointer}
+.size-opt label{font-size:12px;color:var(--g5);cursor:pointer;transition:color .2s}
+.size-opt input[type="radio"]:checked + label{color:var(--or);font-weight:600}
+/* REQUIREMENT 3: QUANTITY BUTTONS ── */
+.qty-row{display:flex;align-items:center;gap:10px;margin-top:4px}
+.qty-btn{width:30px;height:30px;border-radius:50%;background:var(--orl);color:var(--or);border:none;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+/* HOVER EFFECT on qty buttons */
+.qty-btn:hover{background:var(--or);color:#fff;transform:scale(1.12)}
+.qty-num{font-size:15px;font-weight:700;min-width:20px;text-align:center}
+
+/* REQUIREMENT 6: ACCORDION for descriptions ── */
+.food-accordion{margin-top:10px}
+details{border-top:1px solid var(--g1);padding-top:8px}
+details summary{
+  font-size:12px;font-weight:600;color:var(--g5);
+  cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;
+  padding:4px 0;transition:color .2s;user-select:none;
+}
+/* HOVER EFFECT on accordion summary */
+details summary:hover{color:var(--or)}
+details summary::after{content:'▾';font-size:14px;transition:transform .25s}
+details[open] summary::after{transform:rotate(-180deg)}
+details summary::-webkit-details-marker{display:none}
+.accordion-body{padding:10px 0 4px;font-size:12px;color:var(--g7);line-height:1.65}
+.ingredient-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.ingredient{background:var(--orl);color:var(--ord);padding:2px 9px;border-radius:999px;font-size:10px;font-weight:600}
+
+/* ── REQUIREMENT 4: ORDER FORM ── */
+#contact-section{padding:70px 0;background:var(--g0)}
+.order-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.form-card{background:#fff;border-radius:22px;padding:36px;border:1px solid var(--g1)}
+.form-title{font-family:var(--fd);font-size:22px;font-weight:900;margin-bottom:22px;color:var(--g9)}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--g7);margin-bottom:6px;letter-spacing:.03em}
+/* HOVER EFFECT on inputs */
+.form-input{width:100%;padding:12px 16px;border:1.5px solid var(--g1);border-radius:12px;font-size:14px;font-family:var(--fb);color:var(--g9);outline:none;transition:all .22s;background:#fff}
+.form-input:hover{border-color:var(--g3)}
+.form-input:focus{border-color:var(--or);box-shadow:0 0 0 3px rgba(15,118,110,.09)}
+textarea.form-input{resize:vertical;min-height:100px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* Radio buttons for delivery type */
+.delivery-opts{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+.delivery-opt{display:flex;align-items:center;gap:7px;padding:8px 14px;border:1.5px solid var(--g1);border-radius:999px;cursor:pointer;transition:all .2s}
+/* HOVER EFFECT on delivery options */
+.delivery-opt:hover{border-color:var(--or);background:var(--orl)}
+.delivery-opt input[type="radio"]{accent-color:var(--or);width:15px;height:15px}
+.delivery-opt span{font-size:13px;font-weight:500}
+.delivery-opt:has(input:checked){border-color:var(--or);background:var(--orl);color:var(--or)}
+/* Checkboxes for extras */
+.extras-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.extra-opt{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--g1);border-radius:10px;cursor:pointer;transition:all .2s;font-size:12px}
+.extra-opt:hover{border-color:var(--or);background:var(--orl)}
+.extra-opt input{accent-color:var(--or)}
+
+/* ── REQUIREMENT 5: ORDER SUMMARY TABLE ── */
+.order-summary-card{background:#fff;border-radius:22px;padding:28px;border:1px solid var(--g1);position:sticky;top:80px}
+.summary-title{font-family:var(--fd);font-size:20px;font-weight:900;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+.order-table{width:100%;border-collapse:collapse}
+.order-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g5);padding:8px 10px;text-align:left;background:var(--g0);border-bottom:1px solid var(--g1)}
+.order-table td{padding:10px;font-size:13px;color:var(--g7);border-bottom:1px solid var(--g1);vertical-align:middle}
+/* HOVER EFFECT on table rows */
+.order-table tr:hover td{background:var(--orl)}
+.order-table .item-name{font-weight:600;color:var(--g9)}
+.order-table .item-price{font-weight:700;color:var(--or)}
+.order-table tfoot td{font-size:13px;color:var(--g5);padding:8px 10px}
+.order-table tfoot .total-row td{font-size:16px;font-weight:700;color:var(--g9);border-top:2px solid var(--g1);padding-top:12px}
+.table-empty{text-align:center;padding:28px;color:var(--g3);font-size:13px}
+.coupon-row{display:flex;align-items:center;gap:8px;margin:16px 0 10px}
+.coupon-input{flex:1;padding:9px 14px;border:1.5px solid var(--g1);border-radius:999px;font-size:13px;font-family:var(--fb);outline:none;transition:border-color .2s}
+.coupon-input:focus{border-color:var(--or)}
+
+/* ── CONTACT ── */
+#contact{padding:70px 0;background:#fff}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;margin-top:36px}
+.contact-info-card{background:var(--g9);border-radius:22px;padding:36px;color:#fff}
+.contact-info-title{font-family:var(--fd);font-size:22px;font-weight:900;color:#fff;margin-bottom:20px}
+.contact-item{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.contact-item:last-child{border:none;margin:0;padding:0}
+.contact-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.contact-item-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g3);margin-bottom:4px}
+.contact-item-val{font-size:14px;color:#fff;line-height:1.55}
+/* HOVER EFFECT on map */
+.map-embed{border-radius:18px;overflow:hidden;border:1px solid var(--g1);transition:box-shadow .25s}
+.map-embed:hover{box-shadow:var(--sh2)}
+
+/* ── FOOTER ── */
+footer{background:var(--g9);padding:50px 0 26px}
+.footer-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:40px;margin-bottom:36px}
+.footer-logo{font-family:var(--fd);font-size:22px;font-weight:900;color:#fff;margin-bottom:10px}
+.footer-logo span{color:var(--or)}
+.footer-desc{font-size:13px;color:var(--g3);line-height:1.65;max-width:230px}
+.footer-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g5);margin-bottom:14px}
+/* Hyperlinks in footer — HOVER EFFECT */
+.footer-col a{display:block;font-size:13px;color:var(--g3);text-decoration:none;margin-bottom:9px;transition:color .2s}
+.footer-col a:hover{color:var(--or)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.footer-bottom p{font-size:12px;color:var(--g5)}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.toast{background:var(--g9);color:#fff;padding:11px 20px;border-radius:999px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;animation:tin .3s ease;white-space:nowrap;box-shadow:0 6px 28px rgba(0,0,0,.2)}
+.toast.out{animation:tout .28s ease forwards}
+@keyframes tin{from{opacity:0;transform:translateY(16px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tout{to{opacity:0;transform:translateY(8px) scale(.9)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero-grid,.order-form-grid,.contact-grid{grid-template-columns:1fr}
+  .hero-img{max-width:320px}.fc1,.fc2{display:none}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
+  .order-summary-card{position:static}
+}
+@media(max-width:640px){
+  .hero-grid{padding:60px 0 40px}
+  .food-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .menu-controls{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     REQUIREMENT 1: NAVIGATION with buttons + hyperlinks
+═══════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="container nav-inner">
+    <a href="#home" class="nav-logo">Tasty<span>Trail</span></a>
+
+    <!-- Navigation links using <a> hyperlinks -->
+    <ul class="nav-links">
+      <li><a href="#home" class="active" onclick="setActive(this)">🏠 Home</a></li>
+      <li><a href="#menu" onclick="setActive(this)">🍽️ Menu</a></li>
+      <li><a href="#offers" onclick="setActive(this)">🎁 Offers</a></li>
+      <li><a href="#contact" onclick="setActive(this)">📞 Contact</a></li>
+    </ul>
+
+    <!-- Navigation buttons -->
+    <div class="nav-actions">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('contact-section').scrollIntoView({behavior:'smooth'})">📦 Order Now</button>
+      <button class="cart-btn" onclick="scrollToSummary()">
+        🛒 Cart <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════ -->
+<section id="home">
+  <div style="position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1400&auto=format&fit=crop&q=80') center/cover;opacity:.1"></div>
+  <div style="position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(15,118,110,.15) 0%,transparent 70%);width:600px;height:600px;top:-150px;right:-150px;animation:orb 8s ease-in-out infinite"></div>
+  <div class="container hero-grid">
+    <div>
+      <div class="hero-tag"><span class="pulse"></span>Fresh flavours, happy moments</div>
+      <h1 class="hero-h1">Authentic Flavours,<br>Delivered <span class="accent">Hot & Fast</span></h1>
+      <p class="hero-sub">Discover freshly prepared favourites made with quality ingredients and homestyle care. Pick your meal, customise it, and enjoy a delicious experience delivered to your doorstep.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-or" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">🍽️ &nbsp;Browse Menu</button>
+        <button class="btn btn-out" onclick="document.getElementById('offers').scrollIntoView({behavior:'smooth'})">🎁 &nbsp;See Offers</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-val">4.8★</div><div class="stat-lbl">Rating</div></div>
+        <div><div class="stat-val">28 min</div><div class="stat-lbl">Avg. delivery</div></div>
+        <div><div class="stat-val">200+</div><div class="stat-lbl">Happy orders today</div></div>
+        <div><div class="stat-val">Free</div><div class="stat-lbl">Delivery above ₹299</div></div>
+      </div>
+    </div>
+    <div class="hero-img-wrap">
+      <img src="https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=700&auto=format&fit=crop&q=80" alt="Delicious Butter Chicken" class="hero-img">
+      <div class="float-card fc1">
+        <span style="font-size:26px">⏱️</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--g7)">Quick delivery</div><div style="font-size:11px;color:var(--g5)">Avg. 28 minutes</div></div>
+      </div>
+      <div class="float-card fc2">
+        <span style="font-size:26px">👨‍🍳</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--g7)">Chef's special</div><div style="font-size:11px;color:var(--g5)">Fresh every day</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     OFFERS (Requirement 1 — Offers page)
+═══════════════════════════════════════════ -->
+<section id="offers" style="padding:70px 0;background:var(--g0)">
+  <div class="container">
+    <p class="section-label">Today's deals</p>
+    <h2 class="section-title">Hot Offers For You 🔥</h2>
+    <div class="offers-grid">
+      <div class="offer-card o1" onclick="applyCoupon('TASTY15')">
+        <div class="offer-emoji">🎉</div>
+        <div>
+          <div class="offer-title">15% Off Your First Order</div>
+          <div class="offer-sub">Enjoy 15% off your first order with us</div>
+          <div class="offer-code">Use code: TASTY15</div>
+        </div>
+      </div>
+      <div class="offer-card o2" onclick="applyCoupon('FREESHIP')">
+        <div class="offer-emoji">🚚</div>
+        <div>
+          <div class="offer-title">Free Delivery</div>
+          <div class="offer-sub">Free delivery on all orders above ₹299. No minimum fuss!</div>
+          <div class="offer-code">Auto applied above ₹299</div>
+        </div>
+      </div>
+      <div class="offer-card o3" onclick="applyCoupon('BDAY50')">
+        <div class="offer-emoji">🎂</div>
+        <div>
+          <div class="offer-title">Birthday Special</div>
+          <div class="offer-sub">Celebrate with 50% off + a free dessert on your birthday!</div>
+          <div class="offer-code">Use code: BDAY50</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     REQUIREMENT 2: FOOD CATEGORIES — TABS + DROPDOWN
+     REQUIREMENT 3: CHECKBOXES, RADIO BUTTONS, BUTTONS
+     REQUIREMENT 6: ACCORDION
+═══════════════════════════════════════════ -->
+<section id="menu">
+  <div class="container">
+    <p class="section-label">Our menu</p>
+    <h2 class="section-title">What Would You Like Today?</h2>
+
+    <div style="background:var(--orl);border:1px solid #BFE7E2;border-radius:14px;padding:14px 18px;margin:18px 0 22px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:25px">👨‍🍳</span>
+      <div><strong style="color:var(--ord)">Chef's Pick of the Day</strong><p style="font-size:13px;color:var(--g5);margin-top:3px">Try our customer favourites, and use TASTY15 for 15% off your first order.</p></div>
+    </div>
+    <div class="menu-controls">
+      <!-- TABS for category selection — Requirement 2 -->
+      <div class="tab-bar" id="tabBar">
+        <button class="tab-btn active" onclick="switchTab('starters',this)">🥗 Starters</button>
+        <button class="tab-btn" onclick="switchTab('mains',this)">🍛 Mains</button>
+        <button class="tab-btn" onclick="switchTab('biryani',this)">🍚 Biryani</button>
+        <button class="tab-btn" onclick="switchTab('breads',this)">🫓 Breads</button>
+        <button class="tab-btn" onclick="switchTab('desserts',this)">🍰 Desserts</button>
+        <button class="tab-btn" onclick="switchTab('drinks',this)">🥤 Drinks</button>
+      </div>
+
+      <!-- DROPDOWN for veg/non-veg filter — Requirement 2 -->
+      <div class="filter-controls">
+        <span class="filter-label">Filter:</span>
+        <select class="filter-select" onchange="filterItems(this.value)" id="vegFilter">
+          <option value="all">🍽️ All Items</option>
+          <option value="veg">🟢 Veg Only</option>
+          <option value="nonveg">🔴 Non-Veg Only</option>
+          <option value="bestseller">⭐ Bestsellers</option>
+        </select>
+        <input class="menu-search" id="menuSearch" type="search" placeholder="🔎 Search dishes..." oninput="searchMenu(this.value)" aria-label="Search food menu">
+        <select class="filter-select" onchange="sortItems(this.value)">
+          <option value="">Sort by</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name">Name A–Z</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TAB PANELS — one per category -->
+    <!-- STARTERS TAB -->
+    <div class="tab-panel active" id="tab-starters">
+      <div class="food-grid" id="grid-starters"></div>
+    </div>
+    <!-- MAINS TAB -->
+    <div class="tab-panel" id="tab-mains">
+      <div class="food-grid" id="grid-mains"></div>
+    </div>
+    <!-- BIRYANI TAB -->
+    <div class="tab-panel" id="tab-biryani">
+      <div class="food-grid" id="grid-biryani"></div>
+    </div>
+    <!-- BREADS TAB -->
+    <div class="tab-panel" id="tab-breads">
+      <div class="food-grid" id="grid-breads"></div>
+    </div>
+    <!-- DESSERTS TAB -->
+    <div class="tab-panel" id="tab-desserts">
+      <div class="food-grid" id="grid-desserts"></div>
+    </div>
+    <!-- DRINKS TAB -->
+    <div class="tab-panel" id="tab-drinks">
+      <div class="food-grid" id="grid-drinks"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     REQUIREMENT 4: ORDER FORM
+     REQUIREMENT 5: ORDER SUMMARY TABLE
+═══════════════════════════════════════════ -->
+<section id="contact-section" style="padding:70px 0;background:var(--g0)">
+  <div class="container">
+    <p class="section-label">Place your order</p>
+    <h2 class="section-title">Complete Your Order</h2>
+    <div class="order-form-grid">
+
+      <!-- REQUIREMENT 4: CUSTOMER ORDER FORM with text fields, labels, text areas -->
+      <div class="form-card">
+        <div class="form-title">📋 Delivery Details</div>
+
+        <div class="form-row">
+          <!-- Text fields with labels -->
+          <div class="form-group">
+            <label class="form-label" for="fname">First Name *</label>
+            <input class="form-input" type="text" id="fname" name="fname" placeholder="e.g. Gopii" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lname">Last Name</label>
+            <input class="form-input" type="text" id="lname" name="lname" placeholder="e.g. Kumar">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number *</label>
+          <input class="form-input" type="tel" id="phone" name="phone" placeholder="+91 98765 43210" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input class="form-input" type="email" id="email" name="email" placeholder="gopii@example.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address">Delivery Address *</label>
+          <input class="form-input" type="text" id="address" name="address" placeholder="House / Flat No., Street Name" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="city">City</label>
+            <input class="form-input" type="text" id="city" name="city" value="Salem">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pincode">Pincode *</label>
+            <input class="form-input" type="text" id="pincode" name="pincode" placeholder="636001" required>
+          </div>
+        </div>
+
+        <!-- Radio buttons for Delivery Type -->
+        <div class="form-group">
+          <label class="form-label">Delivery Type *</label>
+          <div class="delivery-opts">
+            <label class="delivery-opt">
+              <input type="radio" name="deliveryType" value="home" checked> <span>🏠 Home</span>
+            </label>
+            <label class="delivery-opt">
+              <input type="radio" name="deliveryType" value="office"> <span>🏢 Office</span>
+            </label>
+            <label class="delivery-opt">
+              <input type="radio" name="deliveryType" value="other"> <span>📍 Other</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Checkboxes for extras -->
+        <div class="form-group">
+          <label class="form-label">Add-ons & Extras</label>
+          <div class="extras-grid">
+            <label class="extra-opt"><input type="checkbox" id="ex1" onchange="toggleExtra('Extra Raita',40,this)"> Extra Raita +₹40</label>
+            <label class="extra-opt"><input type="checkbox" id="ex2" onchange="toggleExtra('Papad',20,this)"> Papad +₹20</label>
+            <label class="extra-opt"><input type="checkbox" id="ex3" onchange="toggleExtra('Extra Gravy',30,this)"> Extra Gravy +₹30</label>
+            <label class="extra-opt"><input type="checkbox" id="ex4" onchange="toggleExtra('Sweet Chutney',15,this)"> Sweet Chutney +₹15</label>
+          </div>
+        </div>
+
+        <!-- Text area for special instructions -->
+        <div class="form-group">
+          <label class="form-label" for="instructions">Special Instructions</label>
+          <textarea class="form-input" id="instructions" name="instructions" placeholder="Any special requests? e.g. Less spicy, extra sauce, allergies..."></textarea>
+        </div>
+
+        <!-- Payment method radio -->
+        <div class="form-group">
+          <label class="form-label">Payment Method *</label>
+          <div class="delivery-opts">
+            <label class="delivery-opt">
+              <input type="radio" name="payment" value="upi" checked> <span>📱 UPI</span>
+            </label>
+            <label class="delivery-opt">
+              <input type="radio" name="payment" value="card"> <span>💳 Card</span>
+            </label>
+            <label class="delivery-opt">
+              <input type="radio" name="payment" value="cod"> <span>💵 COD</span>
+            </label>
+          </div>
+        </div>
+
+        <button class="btn btn-or" style="width:100%;justify-content:center;padding:15px;font-size:15px" onclick="submitOrder()">
+          🚀 Place Order
+        </button>
+        <p style="font-size:11px;color:var(--g5);text-align:center;margin-top:10px">By placing order you agree to our <a href="#" style="color:var(--or)">Terms</a> & <a href="#" style="color:var(--or)">Privacy Policy</a></p>
+      </div>
+
+      <!-- REQUIREMENT 5: ORDER SUMMARY TABLE -->
+      <div class="order-summary-card" id="orderSummaryCard">
+        <div class="summary-title">
+          <span>🧾 Order Summary</span>
+          <button class="btn btn-ghost btn-xs" onclick="clearCart()">Clear all</button>
+        </div>
+
+        <!-- Coupon/promo input -->
+        <div class="coupon-row">
+          <input class="coupon-input" type="text" id="couponInput" placeholder="Enter promo code (e.g. TASTY15)">
+          <button class="btn btn-or btn-xs" onclick="applyPromo()">Apply</button>
+        </div>
+        <div id="promoMsg" style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:10px;display:none"></div>
+
+        <!-- The actual table — Requirement 5 -->
+        <div style="overflow-x:auto">
+          <table class="order-table" id="orderTable">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Size</th>
+                <th style="text-align:center">Qty</th>
+                <th style="text-align:right">Price</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="orderTableBody">
+              <tr id="emptyRow">
+                <td colspan="5" class="table-empty">🛒 Your cart is empty<br><small>Add items from the menu above</small></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr><td colspan="4" style="padding:6px 10px;color:var(--g5);font-size:12px">Subtotal</td><td class="item-price" style="padding:6px 10px;text-align:right">₹<span id="subtotal">0</span></td></tr>
+              <tr><td colspan="4" style="padding:6px 10px;color:var(--green);font-size:12px">Delivery</td><td style="padding:6px 10px;text-align:right;color:var(--green);font-weight:600;font-size:12px" id="deliveryFeeRow">₹49</td></tr>
+              <tr id="discountRow" style="display:none"><td colspan="4" style="padding:6px 10px;color:var(--green);font-size:12px">Discount</td><td style="padding:6px 10px;text-align:right;color:var(--green);font-weight:600;font-size:12px">-₹<span id="discountAmt">0</span></td></tr>
+              <tr class="total-row"><td colspan="4" style="padding:10px;font-weight:700">Total Amount</td><td style="padding:10px;text-align:right;color:var(--or);font-size:18px;font-weight:900">₹<span id="grandTotal">0</span></td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Estimated delivery -->
+        <div style="background:var(--orl);border-radius:12px;padding:12px 16px;margin-top:16px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:20px">🛵</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--or)">Estimated delivery: 28–35 min</div>
+            <div style="font-size:11px;color:var(--g5)">Live tracking available after order confirmation</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CONTACT (Requirement 1 — Contact page)
+═══════════════════════════════════════════ -->
+<section id="contact">
+  <div class="container">
+    <p class="section-label">Find us</p>
+    <h2 class="section-title">Contact & Location</h2>
+    <div class="contact-grid">
+      <div class="contact-info-card">
+        <div class="contact-info-title">Get In Touch 📞</div>
+        <div class="contact-item">
+          <span class="contact-icon">📍</span>
+          <div>
+            <div class="contact-item-label">Address</div>
+            <div class="contact-item-val">12 Omalur Road, Near Bus Stand,<br>Salem, Tamil Nadu — 636 004</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">📞</span>
+          <div>
+            <div class="contact-item-label">Phone</div>
+            <div class="contact-item-val"><a href="tel:+914272345678" style="color:#fff;text-decoration:none">+91 427 234 5678</a><br><a href="tel:+919876543210" style="color:var(--g3);font-size:13px;text-decoration:none">+91 98765 43210</a></div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">⏰</span>
+          <div>
+            <div class="contact-item-label">Hours</div>
+            <div class="contact-item-val">Mon – Fri: 11 AM – 10:30 PM<br>Sat – Sun: 10 AM – 11 PM</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">✉️</span>
+          <div>
+            <div class="contact-item-label">Email</div>
+            <div class="contact-item-val"><a href="mailto:hello@spicegarden.in" style="color:#fff;text-decoration:none">hello@spicegarden.in</a></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:18px">
+          <a href="#" class="btn btn-or btn-sm">📘 Facebook</a>
+          <a href="#" class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,.2)">📸 Instagram</a>
+        </div>
+      </div>
+      <div>
+        <!-- Map embed -->
+        <div class="map-embed">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d62548.47!2d78.15!3d11.67!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3babf1d9d9f40001%3A0x1!2sSalem%2C+Tamil+Nadu!5e0!3m2!1sen!2sin!4v1"
+            width="100%" height="340" style="border:0;display:block" allowfullscreen loading="lazy">
+          </iframe>
+        </div>
+        <div style="background:#fff;border-radius:18px;padding:22px;margin-top:18px;border:1px solid var(--g1);display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="text-align:center;padding:14px;background:var(--orl);border-radius:12px">
+            <div style="font-size:26px;margin-bottom:6px">🏍️</div>
+            <div style="font-size:12px;font-weight:700;color:var(--or)">Fast Delivery</div>
+            <div style="font-size:11px;color:var(--g5)">Within 5 km radius</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:var(--orl);border-radius:12px">
+            <div style="font-size:26px;margin-bottom:6px">🍽️</div>
+            <div style="font-size:12px;font-weight:700;color:var(--or)">Dine In</div>
+            <div style="font-size:11px;color:var(--g5)">50 seater capacity</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:var(--orl);border-radius:12px">
+            <div style="font-size:26px;margin-bottom:6px">📦</div>
+            <div style="font-size:12px;font-weight:700;color:var(--or)">Takeaway</div>
+            <div style="font-size:11px;color:var(--g5)">Ready in 15 minutes</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:var(--orl);border-radius:12px">
+            <div style="font-size:26px;margin-bottom:6px">🎉</div>
+            <div style="font-size:12px;font-weight:700;color:var(--or)">Catering</div>
+            <div style="font-size:11px;color:var(--g5)">Events & functions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER with hyperlinks -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Tasty<span>Trail</span></div>
+        <p class="footer-desc">Freshly prepared favourites, crafted with care and served with a smile. Your neighbourhood food stop for every craving.</p>
+      </div>
+      <!-- Footer hyperlinks — Requirement 1 -->
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="#home">Home</a>
+        <a href="#menu">Menu</a>
+        <a href="#offers">Offers</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Menu</h4>
+        <a href="#" onclick="switchTab('starters',null);document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Starters</a>
+        <a href="#" onclick="switchTab('mains',null);document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Mains</a>
+        <a href="#" onclick="switchTab('biryani',null);document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Biryani</a>
+        <a href="#" onclick="switchTab('desserts',null);document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Desserts</a>
+      </div>
+      <div class="footer-col">
+        <h4>Info</h4>
+        <a href="#">About Us</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Feedback</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 TastyTrail. All rights reserved.</p>
+      <p>Made with ❤️ for food lovers</p>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+// ── MENU DATA ──────────────────────────────
+const MENU = {
+  starters:[
+    {id:'s1',name:'Paneer Tikka',price:220,halfPrice:140,img:'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Bestseller','Chef Special'],desc:'Cubes of fresh paneer marinated overnight in a blend of yogurt and aromatic spices, then chargrilled in a tandoor oven to perfection.',ingredients:['Paneer','Bell Peppers','Onion','Yogurt','Cumin','Coriander','Turmeric','Garam Masala'],cal:280,sizes:['half','full']},
+    {id:'s2',name:'Chicken Seekh Kebab',price:280,halfPrice:180,img:'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&auto=format&fit=crop&q=80',veg:false,tags:['Spicy'],desc:'Minced chicken seasoned with fresh herbs and spices, shaped onto skewers and slow-cooked in the tandoor. Served with mint chutney.',ingredients:['Chicken Mince','Ginger','Garlic','Green Chilli','Coriander','Cardamom','Onion'],cal:320,sizes:['half','full']},
+    {id:'s3',name:'Veg Spring Rolls',price:180,halfPrice:110,img:'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Crispy','New'],desc:'Crispy golden rolls filled with a spiced mix of vegetables, served with sweet chilli and soy dipping sauce.',ingredients:['Cabbage','Carrot','Beans','Capsicum','Ginger','Soy Sauce','Spring Onion'],cal:210,sizes:['half','full']},
+    {id:'s4',name:'Chicken 65',price:260,halfPrice:165,img:'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&auto=format&fit=crop&q=80',veg:false,tags:['Bestseller','Spicy'],desc:'A classic South Indian fried chicken dish deep-fried with a spicy yogurt batter, curry leaves and red chillies.',ingredients:['Chicken','Yogurt','Red Chilli','Curry Leaves','Garlic','Ginger','Lemon'],cal:380,sizes:['half','full']},
+  ],
+  mains:[
+    {id:'m1',name:'Butter Chicken',price:320,halfPrice:200,img:'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400&auto=format&fit=crop&q=80',veg:false,tags:['Bestseller','Chef Special'],desc:'Tender chicken pieces simmered in a rich, velvety tomato-cream sauce. Our most beloved dish, slow-cooked for 4 hours for maximum flavour.',ingredients:['Chicken','Tomatoes','Butter','Fresh Cream','Cashews','Cardamom','Bay Leaf','Fenugreek'],cal:420,sizes:['half','full']},
+    {id:'m2',name:'Dal Makhani',price:240,halfPrice:150,img:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Veg Special'],desc:'Black lentils slow-cooked overnight on low flame with butter and cream — a dish that gets better with time. Rich, creamy and deeply satisfying.',ingredients:['Black Lentils','Kidney Beans','Butter','Cream','Tomatoes','Onion','Ginger','Garlic'],cal:340,sizes:['half','full']},
+    {id:'m3',name:'Palak Paneer',price:280,halfPrice:175,img:'https://images.unsplash.com/photo-1574653853027-5382a3d23a15?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Healthy','Bestseller'],desc:'Fresh cottage cheese cubes in a vibrant, iron-rich spinach gravy. Nutritious, flavourful and a staple of Indian cuisine.',ingredients:['Paneer','Spinach','Onion','Tomatoes','Garlic','Ginger','Cream','Spices'],cal:310,sizes:['half','full']},
+    {id:'m4',name:'Chicken Vindaloo',price:360,halfPrice:230,img:'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&auto=format&fit=crop&q=80',veg:false,tags:['Extra Spicy','Goan'],desc:'A fiery Goan-style curry with tender chicken in a tangy, deeply spiced sauce. For the true spice lovers only!',ingredients:['Chicken','Vinegar','Red Chilli','Mustard Seeds','Garlic','Ginger','Cumin','Cloves'],cal:390,sizes:['half','full']},
+  ],
+  biryani:[
+    {id:'b1',name:'Mutton Biryani',price:380,halfPrice:null,img:'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&auto=format&fit=crop&q=80',veg:false,tags:['Bestseller'],desc:'Slow-cooked tender mutton layered with fragrant basmati rice, caramelised onions and saffron. Dum-cooked for the most authentic biryani experience.',ingredients:['Basmati Rice','Mutton','Saffron','Caramelised Onions','Yogurt','Whole Spices','Mint','Rose Water'],cal:580,sizes:['full']},
+    {id:'b2',name:'Chicken Dum Biryani',price:320,halfPrice:null,img:'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&auto=format&fit=crop&q=80',veg:false,tags:['Bestseller','Chef Special'],desc:'Juicy marinated chicken pieces cooked with long-grain basmati rice in a sealed pot. Each grain of rice absorbs the rich flavour of the masala.',ingredients:['Basmati Rice','Chicken','Fried Onions','Saffron Milk','Ghee','Garam Masala','Mint','Coriander'],cal:520,sizes:['full']},
+    {id:'b3',name:'Veg Biryani',price:260,halfPrice:null,img:'https://images.unsplash.com/photo-1574653853027-5382a3d23a15?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Veg Special'],desc:'A colourful medley of fresh vegetables cooked with aromatic basmati rice. Served with raita and papad.',ingredients:['Basmati Rice','Mixed Vegetables','Saffron','Fried Onions','Ghee','Whole Spices','Mint','Coriander'],cal:440,sizes:['full']},
+  ],
+  breads:[
+    {id:'br1',name:'Butter Naan',price:60,halfPrice:null,img:'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400&auto=format&fit=crop&q=80',veg:true,tags:[],desc:'Soft, fluffy leavened bread brushed generously with fresh butter and cooked in a clay tandoor oven.',ingredients:['Maida','Yeast','Yogurt','Butter','Salt','Sugar'],cal:140,sizes:['full']},
+    {id:'br2',name:'Garlic Naan',price:80,halfPrice:null,img:'https://images.unsplash.com/photo-1619985460792-4fd6a1ec8e54?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Bestseller'],desc:'Tandoor-baked naan topped with freshly minced garlic, butter and chopped coriander. A classic favourite.',ingredients:['Maida','Garlic','Butter','Coriander','Yeast','Yogurt'],cal:165,sizes:['full']},
+    {id:'br3',name:'Paratha',price:50,halfPrice:null,img:'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&auto=format&fit=crop&q=80',veg:true,tags:[],desc:'Whole wheat layered flatbread cooked on a tawa with a generous drizzle of clarified butter. Served with pickle and yogurt.',ingredients:['Whole Wheat Flour','Ghee','Salt','Water'],cal:120,sizes:['full']},
+  ],
+  desserts:[
+    {id:'d1',name:'Gulab Jamun',price:120,halfPrice:null,img:'https://images.unsplash.com/photo-1605197788044-d6a6afe3b3c8?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Bestseller'],desc:'Soft milk-solid dumplings soaked in warm rose-flavoured sugar syrup. Served with a dusting of pistachios.',ingredients:['Khoya','Maida','Sugar','Rose Water','Cardamom','Saffron','Ghee'],cal:290,sizes:['full']},
+    {id:'d2',name:'Mango Kulfi',price:100,halfPrice:null,img:'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Seasonal'],desc:'Traditional Indian frozen dessert made with condensed milk and fresh Alphonso mango pulp. Denser and creamier than regular ice cream.',ingredients:['Condensed Milk','Alphonso Mango','Cardamom','Saffron','Pistachios'],cal:220,sizes:['full']},
+    {id:'d3',name:'Chocolate Halwa',price:140,halfPrice:null,img:'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&auto=format&fit=crop&q=80',veg:true,tags:['New'],desc:'A fusion twist on the classic Indian halwa — rich semolina slow-cooked with cocoa, ghee and topped with nuts.',ingredients:['Semolina','Cocoa Powder','Sugar','Ghee','Cashews','Almonds','Milk'],cal:310,sizes:['full']},
+  ],
+  drinks:[
+    {id:'dr1',name:'Mango Lassi',price:120,halfPrice:null,img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Bestseller'],desc:'Chilled yogurt-based drink blended with sweet Alphonso mango pulp and a hint of cardamom. Refreshing and cooling.',ingredients:['Yogurt','Mango Pulp','Sugar','Cardamom','Rose Water','Ice'],cal:195,sizes:['full']},
+    {id:'dr2',name:'Masala Chai',price:60,halfPrice:null,img:'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&auto=format&fit=crop&q=80',veg:true,tags:[],desc:'Traditional spiced Indian tea brewed with ginger, cardamom, cinnamon and cloves. Perfect to end your meal.',ingredients:['Black Tea','Milk','Ginger','Cardamom','Cinnamon','Cloves','Sugar'],cal:85,sizes:['full']},
+    {id:'dr3',name:'Fresh Lime Soda',price:80,halfPrice:null,img:'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&auto=format&fit=crop&q=80',veg:true,tags:['Healthy'],desc:'Freshly squeezed lime juice with sparkling soda water, mint leaves and a pinch of black salt.',ingredients:['Fresh Lime','Soda Water','Sugar','Black Salt','Mint Leaves','Ice'],cal:45,sizes:['full']},
+  ],
+};
+
+// ── STATE ──────────────────────────────────
+let cart = {};
+let discount = 0;
+let currentTab = 'starters';
+let vegFilter = 'all';
+
+// ── INIT ───────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  Object.keys(MENU).forEach(cat => renderCategory(cat));
+  setupNavScroll();
+});
+
+// ── NAV ────────────────────────────────────
+function setActive(el) {
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setupNavScroll() {
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+    // Auto-highlight nav on scroll
+    const sections = ['home','offers','menu','contact-section','contact'];
+    const navMap = {'home':'#home','offers':'#offers','menu':'#menu','contact-section':'#contact-section','contact':'#contact'};
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= 80 && rect.bottom > 80) {
+        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+        const map = {home:'Home',offers:'Offers',menu:'Menu','contact-section':'Contact',contact:'Contact'};
+      }
+    });
+  });
+}
+
+function scrollToSummary() {
+  document.getElementById('contact-section').scrollIntoView({behavior:'smooth'});
+}
+
+// ── TABS ───────────────────────────────────
+function switchTab(cat, btn) {
+  const searchBox = document.getElementById('menuSearch');
+  if (searchBox) searchBox.value = '';
+  document.querySelectorAll('.food-card').forEach(card => card.style.display = '');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + cat).classList.add('active');
+  if (btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  } else {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      if (b.textContent.toLowerCase().includes(cat.slice(0,3))) b.classList.add('active');
+    });
+  }
+  currentTab = cat;
+}
+
+// ── FILTER / SORT ──────────────────────────
+function filterItems(val) {
+  vegFilter = val;
+  Object.keys(MENU).forEach(cat => renderCategory(cat));
+}
+
+function sortItems(val) {
+  Object.keys(MENU).forEach(cat => {
+    const grid = document.getElementById('grid-' + cat);
+    const cards = [...grid.querySelectorAll('.food-card-wrapper')];
+    cards.sort((a, b) => {
+      const pa = parseInt(a.dataset.price), pb = parseInt(b.dataset.price);
+      const na = a.dataset.name, nb = b.dataset.name;
+      if (val === 'price-asc') return pa - pb;
+      if (val === 'price-desc') return pb - pa;
+      if (val === 'name') return na.localeCompare(nb);
+      return 0;
+    });
+    cards.forEach(c => grid.appendChild(c));
+  });
+}
+
+// ── RENDER FOOD CARDS ──────────────────────
+function renderCategory(cat) {
+  const grid = document.getElementById('grid-' + cat);
+  let items = MENU[cat];
+  if (vegFilter === 'veg') items = items.filter(i => i.veg);
+  else if (vegFilter === 'nonveg') items = items.filter(i => !i.veg);
+  else if (vegFilter === 'bestseller') items = items.filter(i => i.tags.includes('Bestseller'));
+
+  grid.innerHTML = items.map(item => `
+  <div class="food-card-wrapper" data-price="${item.price}" data-name="${item.name}" data-veg="${item.veg}">
+    <div class="food-card" id="card-${item.id}">
+      <img src="${item.img}" alt="${item.name}" class="food-card-img" loading="lazy"
+        onerror="this.src='https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&auto=format&fit=crop&q=80'">
+      <div class="food-card-body">
+        <div class="food-card-top">
+          <div>
+            <div class="food-name">
+              <span class="veg-dot ${item.veg ? 'veg' : 'nonveg'}"></span>${item.name}
+            </div>
+            <div style="font-size:11px;color:var(--g5);margin-top:2px">${item.cal} kcal</div>
+          </div>
+          <div class="food-price">₹${item.price}</div>
+        </div>
+
+        <div class="food-tags">
+          ${item.tags.map(t => `<span class="food-tag ${t==='Bestseller'?'hot':t==='New'?'new':''}">${t==='Bestseller'?'⭐':t==='Spicy'?'🌶️':t==='New'?'✨':''} ${t}</span>`).join('')}
+        </div>
+
+        <div class="food-desc">${item.desc.slice(0, 90)}...</div>
+
+        <!-- REQUIREMENT 3: CHECKBOX to add to order -->
+        <div class="food-check-row">
+          <input type="checkbox" id="chk-${item.id}" onchange="toggleItem('${item.id}', this.checked, ${item.price}, '${item.name}')">
+          <label class="food-check-label" for="chk-${item.id}">Add to order</label>
+        </div>
+
+        <!-- REQUIREMENT 3: RADIO BUTTONS for size selection -->
+        ${item.sizes.includes('half') ? `
+        <div style="font-size:11px;font-weight:700;color:var(--g5);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Choose size:</div>
+        <div class="size-row">
+          <div class="size-opt">
+            <input type="radio" name="size-${item.id}" id="half-${item.id}" value="half" onchange="changeSize('${item.id}','half',${item.halfPrice})">
+            <label for="half-${item.id}">Half — ₹${item.halfPrice}</label>
+          </div>
+          <div class="size-opt">
+            <input type="radio" name="size-${item.id}" id="full-${item.id}" value="full" checked onchange="changeSize('${item.id}','full',${item.price})">
+            <label for="full-${item.id}">Full — ₹${item.price}</label>
+          </div>
+        </div>` : ''}
+
+        <!-- REQUIREMENT 3: QTY BUTTONS -->
+        <div class="qty-row">
+          <span style="font-size:12px;font-weight:600;color:var(--g5)">Qty:</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}', -1, ${item.price}, '${item.name}')">−</button>
+          <span class="qty-num" id="qty-${item.id}">0</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}', 1, ${item.price}, '${item.name}')">+</button>
+          <button class="btn btn-or btn-xs" style="margin-left:auto" onclick="quickAdd('${item.id}', ${item.price}, '${item.name}')">+ Add</button>
+        </div>
+
+        <!-- REQUIREMENT 6: ACCORDION for description + ingredients -->
+        <div class="food-accordion">
+          <details>
+            <summary>📖 Description & Ingredients</summary>
+            <div class="accordion-body">
+              <strong>About this dish:</strong><br>${item.desc}<br><br>
+              <strong>Key Ingredients:</strong>
+              <div class="ingredient-list">
+                ${item.ingredients.map(ing => `<span class="ingredient">${ing}</span>`).join('')}
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--g5)">🔥 ${item.cal} kcal per serving</div>
+            </div>
+          </details>
+          <details>
+            <summary>🌶️ Spice level & Allergens</summary>
+            <div class="accordion-body">
+              ${!item.veg ? '<span style="color:var(--red)">🔴 Non-Vegetarian</span>' : '<span style="color:var(--green)">🟢 Vegetarian</span>'}<br>
+              ${item.tags.includes('Spicy') || item.tags.includes('Extra Spicy') ? '<span style="color:#92400E">🌶️ Contains chilli — may be spicy</span><br>' : '<span style="color:var(--green)">🌿 Mild spice level</span><br>'}
+              <span style="color:var(--g5)">⚠️ May contain dairy, gluten or nuts. Inform us of any allergies.</span>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </div>
+  </div>`).join('');
+
+  // Restore checkbox / qty states
+  items.forEach(item => {
+    if (cart[item.id]) {
+      const chk = document.getElementById('chk-' + item.id);
+      const qEl = document.getElementById('qty-' + item.id);
+      if (chk) chk.checked = true;
+      if (qEl) qEl.textContent = cart[item.id].qty;
+      document.getElementById('card-' + item.id)?.classList.add('selected');
+    }
+  });
+}
+
+// Search currently displayed menu cards by dish name or description.
+function searchMenu(query) {
+  const q = query.trim().toLowerCase();
+  document.querySelectorAll('.tab-panel.active .food-card').forEach(card => {
+    card.style.display = (!q || card.textContent.toLowerCase().includes(q)) ? '' : 'none';
+  });
+}
+
+// ── CART LOGIC ─────────────────────────────
+function toggleItem(id, checked, price, name) {
+  if (checked) {
+    if (!cart[id]) cart[id] = { price, name, qty: 1, size: 'full' };
+    document.getElementById('card-' + id)?.classList.add('selected');
+    document.getElementById('qty-' + id).textContent = cart[id].qty;
+    showToast('🛒', name + ' added to order!');
+  } else {
+    delete cart[id];
+    document.getElementById('card-' + id)?.classList.remove('selected');
+    document.getElementById('qty-' + id).textContent = 0;
+    showToast('🗑️', name + ' removed from order');
+  }
+  updateTable();
+}
+
+function changeSize(id, size, price) {
+  if (cart[id]) { cart[id].price = price; cart[id].size = size; updateTable(); }
+}
+
+function changeQty(id, delta, price, name) {
+  if (!cart[id]) {
+    if (delta < 0) return;
+    cart[id] = { price, name, qty: 0, size: 'full' };
+  }
+  cart[id].qty = Math.max(0, cart[id].qty + delta);
+  const qEl = document.getElementById('qty-' + id);
+  if (qEl) qEl.textContent = cart[id].qty;
+  const chk = document.getElementById('chk-' + id);
+  if (cart[id].qty === 0) {
+    delete cart[id];
+    if (chk) chk.checked = false;
+    document.getElementById('card-' + id)?.classList.remove('selected');
+  } else {
+    if (chk) chk.checked = true;
+    document.getElementById('card-' + id)?.classList.add('selected');
+    if (delta > 0) showToast('➕', name + ' qty updated');
+  }
+  updateTable();
+}
+
+function quickAdd(id, price, name) {
+  if (!cart[id]) { cart[id] = { price, name, qty: 0, size: 'full' }; }
+  cart[id].qty += 1;
+  const qEl = document.getElementById('qty-' + id);
+  if (qEl) qEl.textContent = cart[id].qty;
+  const chk = document.getElementById('chk-' + id);
+  if (chk) chk.checked = true;
+  document.getElementById('card-' + id)?.classList.add('selected');
+  updateTable();
+  showToast('✅', name + ' added!');
+}
+
+function toggleExtra(name, price, chk) {
+  const id = 'extra-' + name.replace(/\s/g,'');
+  if (chk.checked) { cart[id] = { price, name, qty: 1, size: '' }; showToast('➕', name + ' added'); }
+  else { delete cart[id]; }
+  updateTable();
+}
+
+function clearCart() {
+  if (!Object.keys(cart).length) return;
+  if (!confirm('Clear all items from cart?')) return;
+  cart = {}; discount = 0;
+  // Uncheck all checkboxes and reset qty
+  document.querySelectorAll('.food-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('[id^="chk-"]').forEach(c => c.checked = false);
+  document.querySelectorAll('[id^="qty-"]').forEach(q => q.textContent = 0);
+  document.querySelectorAll('[id^="ex"]').forEach(c => c.checked = false);
+  document.getElementById('promoMsg').style.display = 'none';
+  updateTable(); showToast('🗑️', 'Cart cleared');
+}
+
+// ── ORDER TABLE (Requirement 5) ────────────
+function updateTable() {
+  const items = Object.entries(cart);
+  const tbody = document.getElementById('orderTableBody');
+  const count = document.getElementById('cartCount');
+  const totalItems = items.reduce((s, [,v]) => s + v.qty, 0);
+  count.textContent = totalItems;
+  if (totalItems > 0) { count.style.transform = 'scale(1.4)'; setTimeout(() => count.style.transform = '', 300); }
+
+  if (!items.length) {
+    tbody.innerHTML = '<tr id="emptyRow"><td colspan="5" class="table-empty">🛒 Your cart is empty<br><small>Add items from the menu above</small></td></tr>';
+    document.getElementById('subtotal').textContent = '0';
+    document.getElementById('grandTotal').textContent = '0';
+    document.getElementById('deliveryFeeRow').textContent = '₹49';
+    document.getElementById('discountRow').style.display = 'none';
+    return;
+  }
+
+  tbody.innerHTML = items.map(([id, item]) => `
+  <tr>
+    <td class="item-name">${item.name}</td>
+    <td style="font-size:11px;color:var(--g5)">${item.size || '—'}</td>
+    <td style="text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;gap:5px">
+        <button style="width:22px;height:22px;border-radius:50%;background:var(--orl);color:var(--or);border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all .2s" onmouseover="this.style.background='var(--or)';this.style.color='#fff'" onmouseout="this.style.background='var(--orl)';this.style.color='var(--or)'" onclick="tblQty('${id}',-1,'${item.price}','${item.name}')">−</button>
+        <span style="font-weight:700;min-width:16px;text-align:center">${item.qty}</span>
+        <button style="width:22px;height:22px;border-radius:50%;background:var(--orl);color:var(--or);border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all .2s" onmouseover="this.style.background='var(--or)';this.style.color='#fff'" onmouseout="this.style.background='var(--orl)';this.style.color='var(--or)'" onclick="tblQty('${id}',1,'${item.price}','${item.name}')">+</button>
+      </div>
+    </td>
+    <td class="item-price" style="text-align:right">₹${item.price * item.qty}</td>
+    <td style="text-align:center">
+      <button style="background:none;border:none;cursor:pointer;color:var(--g3);font-size:15px;transition:color .2s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--g3)'" onclick="removeItem('${id}','${item.name}')">✕</button>
+    </td>
+  </tr>`).join('');
+
+  const sub = items.reduce((s, [,v]) => s + v.price * v.qty, 0);
+  const delFee = sub >= 299 ? 0 : 49;
+  const total = sub + delFee - discount;
+  document.getElementById('subtotal').textContent = sub;
+  document.getElementById('deliveryFeeRow').textContent = delFee === 0 ? 'FREE 🎉' : '₹49';
+  document.getElementById('grandTotal').textContent = Math.max(0, total);
+  if (discount > 0) {
+    document.getElementById('discountRow').style.display = '';
+    document.getElementById('discountAmt').textContent = discount;
+  }
+}
+
+function tblQty(id, delta, price, name) { changeQty(id, delta, parseInt(price), name); }
+function removeItem(id, name) { changeQty(id, -99, 0, name); }
+
+// ── PROMO CODE ─────────────────────────────
+function applyPromo() {
+  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  const sub = Object.entries(cart).reduce((s,[,v]) => s+v.price*v.qty, 0);
+  const promoEl = document.getElementById('promoMsg');
+  if (code === 'TASTY15') { discount = Math.round(sub * 0.15); promoEl.textContent = '🎉 TASTY15 applied! 15% off your order'; promoEl.style.display='block'; showToast('🎉','15% discount applied!'); updateTable(); }
+  else if (code === 'BDAY50') { discount = Math.round(sub * 0.5); promoEl.textContent = '🎂 BDAY50 applied! 50% birthday discount'; promoEl.style.display='block'; showToast('🎂','50% birthday discount applied!'); updateTable(); }
+  else if (code === 'FREESHIP') { discount = 49; promoEl.textContent = '🚚 FREESHIP applied! Free delivery'; promoEl.style.display='block'; showToast('🚚','Free delivery unlocked!'); updateTable(); }
+  else { showToast('❌','Invalid promo code. Try TASTY15, BDAY50 or FREESHIP'); }
+}
+
+function applyCoupon(code) {
+  document.getElementById('couponInput').value = code;
+  document.getElementById('contact-section').scrollIntoView({behavior:'smooth'});
+  setTimeout(applyPromo, 600);
+  showToast('📋', 'Code ' + code + ' selected — scroll down to apply!');
+}
+
+// ── ORDER SUBMIT ────────────────────────────
+function submitOrder() {
+  const fname = document.getElementById('fname').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const pincode = document.getElementById('pincode').value.trim();
+  if (!fname) { showToast('⚠️','Please enter your name'); document.getElementById('fname').focus(); return; }
+  if (!phone) { showToast('⚠️','Please enter your phone number'); document.getElementById('phone').focus(); return; }
+  if (!address) { showToast('⚠️','Please enter your delivery address'); document.getElementById('address').focus(); return; }
+  if (!pincode) { showToast('⚠️','Please enter your pincode'); document.getElementById('pincode').focus(); return; }
+  if (!Object.keys(cart).length) { showToast('⚠️','Please add at least one item to your order'); document.getElementById('menu').scrollIntoView({behavior:'smooth'}); return; }
+  const total = parseInt(document.getElementById('grandTotal').textContent);
+  const payment = document.querySelector('input[name="payment"]:checked')?.value;
+  const delivery = document.querySelector('input[name="deliveryType"]:checked')?.value;
+  alert(`✅ Order Confirmed!\n\nName: ${fname}\nPhone: ${phone}\nAddress: ${address}, ${document.getElementById('city').value} - ${pincode}\nDelivery: ${delivery}\nPayment: ${payment?.toUpperCase()}\nTotal: ₹${total}\n\nEstimated delivery: 28–35 minutes\nThank you for ordering from TastyTrail! 🍽️`);
+  showToast('🎉', 'Order placed successfully! Thank you, ' + fname + '!');
+}
+
+// ── TOAST ──────────────────────────────────
+function showToast(icon, msg) {
+  const c = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<span>${icon}</span>${msg}`;
+  c.appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 2700);
+}
+</script>
+</body>
+</html>
